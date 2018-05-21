@@ -8,8 +8,12 @@ let saas = require('gulp-sass');
 let maps = require('gulp-sourcemaps');
 let image = require('gulp-image');
 let del = require('del');
+let imagemin = require('gulp-imagemin');
+let OptiPng = require('optipng');
+let serve = require('gulp-connect');
 
-// concat js script and copy under dist directory
+
+
 gulp.task("scripts", function () {
     gulp.src([
         'js/global.js',
@@ -33,16 +37,25 @@ gulp.task('styles', function () {
 })
 
 gulp.task('images', function () {
-    gulp.src('./images/*')
-      .pipe(image())
+    gulp.src(['./images/*', './icons/svg/*', './icons/*'],{ base: './'})
+      .pipe(imagemin())
       .pipe(gulp.dest('./dist/content'));
+});
+
+
+gulp.task('serve', function() {
+    serve.server({
+      root: '.',
+      livereload: true
+    })
   });
 
-  gulp.task('clean', function() {
+gulp.task('clean', function() {
     del('dist');
-  });
+});
 
-gulp.task('build',['scripts','styles', 'images']);
+gulp.task('build',['scripts','styles', 'images', 'serve']);
+
 
 gulp.task("default", ["clean"], function() {
     gulp.start('build');
